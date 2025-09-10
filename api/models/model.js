@@ -9,12 +9,12 @@
    Then, adapt the initialization of the data at the end of this file (Task 2 - Part 2)
    so that you have some instances of your object available that can be served to the client.
  */
-class Animal {
-    constructor(name, birthday) {
+class Employee {
+    constructor(name, SVN, homeOffice, dateOfEmployment) {
         this.name = name;
-        this.birthday = birthday;
-        if (this.birthday instanceof Date) this.age = new Date() - this.birthday * 1000;
-        if (this.age >= 18) this.adult = true; else this.adult = false;
+        this.SVN = SVN;
+        this.homeOffice = homeOffice;
+        this.dateOfEmployment = dateOfEmployment;
     }
 }
 
@@ -74,8 +74,8 @@ const model = new Model();
 
 /* Task 1 - Part 2. Replace these three instances of the example Class Resource with instances
    of your own class */
-model.add(new Animal("Eric", new Date()));
-model.add(new Animal("Julia", new Date()));
-model.add(new Animal("Alex", new Date()));
+model.add(new Employee("Eric", 364024121989, true, new Date(2025, 0, 1)));
+model.add(new Employee("Julia", 421012031972, false, new Date(1998, 4, 14)));
+model.add(new Employee("Alex", 731209061001, false, new Date(1000, 9, 11)));
 
 module.exports = model;

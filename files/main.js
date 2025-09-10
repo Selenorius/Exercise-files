@@ -84,7 +84,10 @@ function add(resource, sibling) {
        elements manually. */
 
     creator
-        .append(new ElementCreator("h2").text(resource.name))
+        .append(new ElementCreator("h2").text("Name: " + resource.name))
+        .append(new ElementCreator("p").text("SVN: " + resource.SVN))
+        .append(new ElementCreator("p").text("Home-Office: " + resource.homeOffice))
+        .append(new ElementCreator("p").text("Date of Employment: " + resource.dateOfEmployment.substring(0,10).replaceAll('-', '/')))
 
     creator
         .append(new ElementCreator("button").text("Edit").listener('click', () => {
@@ -94,7 +97,24 @@ function add(resource, sibling) {
             /* Task 3: Call the delete endpoint asynchronously using either an XMLHttpRequest
                or the Fetch API. Once the call returns successfully, remove the resource from
                the DOM using the call to remove(...) below. */
-            remove(resource);  // <- This call removes the resource from the DOM. Call it after (and only if) your API call succeeds!
+               fetch('/controllers/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(data => {
+                    if (data.success) {
+                        remove(resource);  // <- This call removes the resource from the DOM. Call it after (and only if) your API call succeeds!
+                        alert("Object deleted successfully!");
+                    } else {
+                        alert(data.error || 'Object deletion failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again later.');
+                });
         }));
 
     const parent = document.querySelector('main');
