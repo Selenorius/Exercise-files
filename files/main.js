@@ -144,6 +144,7 @@ function edit(resource) {
         return `${year}-${month}-${day}`;
     }
 
+    // I use a name value for my employee object, so resource-name is still used
     formCreator
         .append(new ElementCreator("label").text("Name").with("for", "resource-name"))
         .append(new ElementCreator("input").id("resource-name").with("type", "text").with("value", resource.name))
