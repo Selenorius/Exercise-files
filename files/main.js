@@ -127,7 +127,7 @@ function add(resource, sibling) {
 function edit(resource) {
     const formCreator = new ElementCreator("form")
         .id(resource.idforDOM)
-        .append(new ElementCreator("h3").text("Edit " + resource.name));
+        .append(new ElementCreator("h2").text("Edit: " + resource.name));
     
     /* Task 4 - Part 1: Instead of the name property, add the properties your resource has here!
        The label and input element used here are just an example of how you can edit a
@@ -224,11 +224,14 @@ function remove(resource) {
  */
 function create() {
     const existingForm = document.getElementById("create-form");
-    if (existingForm) existingForm.remove();
+    if (existingForm) {
+        existingForm.remove();
+        return;
+    }
 
     const formCreator = new ElementCreator("form")
         .id("create-form")
-        .append(new ElementCreator("h3").text("Add Employee"))
+        .append(new ElementCreator("h2").text("Add: New Employee"))
         .append(new ElementCreator("label").text("Name").with("for", "create-name"))
         .append(new ElementCreator("input").id("create-name").with("type", "text").with("required", "true"))
         .append(new ElementCreator("label").text("SVN").with("for", "create-SVN"))

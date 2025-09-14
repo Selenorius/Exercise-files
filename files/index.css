@@ -82,6 +82,17 @@ article, form {
     border-radius: 6px;
 }
 
+input {
+    margin: 2px;
+    padding: 4px;
+    color: #5C5C5C;
+    border: 1px solid #5C5C5C;
+    border-radius: 6px;
+    font-family: 'Amarante';
+    display: flex;
+    flex-direction: column;
+}
+
 button {
     padding: 4px;
     margin: 2px;
