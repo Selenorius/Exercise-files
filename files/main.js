@@ -97,24 +97,21 @@ function add(resource, sibling) {
             /* Task 3: Call the delete endpoint asynchronously using either an XMLHttpRequest
                or the Fetch API. Once the call returns successfully, remove the resource from
                the DOM using the call to remove(...) below. */
-               fetch('/controllers/delete', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(data => {
-                    if (data.success) {
-                        remove(resource);  // <- This call removes the resource from the DOM. Call it after (and only if) your API call succeeds!
-                        alert("Object deleted successfully!");
-                    } else {
-                        alert(data.error || 'Object deletion failed');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again later.');
-                });
+            fetch(`/api/resources/${resource.id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.status === 204) {
+                    remove(resource);
+                    alert("Object deleted successfully!");
+                } else {
+                    response.text().then(text => alert(text || 'Object deletion failed'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
         }));
 
     const parent = document.querySelector('main');
