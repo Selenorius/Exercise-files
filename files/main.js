@@ -135,6 +135,14 @@ function edit(resource) {
        input field. Also, we assign the input field a unique id attribute to be able to identify
        it easily later when the user saves the edited data (see Task 4 - Part 2 below). 
     */
+    // Form date field wouldn't take date value directly so i added this
+    function formatDateToInputValue(date) {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 
     formCreator
         .append(new ElementCreator("label").text("Name").with("for", "resource-name"))
@@ -142,9 +150,9 @@ function edit(resource) {
         .append(new ElementCreator("label").text("SVN").with("for", "resource-SVN"))
         .append(new ElementCreator("input").id("resource-SVN").with("type", "text").with("value", resource.SVN))
         .append(new ElementCreator("label").text("Is employee in Home-Office?").with("for", "resource-homeOffice"))
-        .append(new ElementCreator("input").id("resource-homeOffice").with("type", "checkbox").with("value", resource.homeOffice))
+        .append(new ElementCreator("input").id("resource-homeOffice").with("type", "checkbox").with("checked", resource.homeOffice))
         .append(new ElementCreator("label").text("Date of employment").with("for", "resource-dateOfEmployment"))
-        .append(new ElementCreator("input").id("resource-dateOfEmployment").with("type", "text").with("value", resource.dateOfEmployment));
+        .append(new ElementCreator("input").id("resource-dateOfEmployment").with("type", "date").with("value", formatDateToInputValue(resource.dateOfEmployment)));
 
     /* In the end, we add the code to handle saving the resource on the server and terminating edit mode */
     formCreator
