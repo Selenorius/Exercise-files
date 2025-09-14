@@ -105,7 +105,7 @@ function add(resource, sibling) {
                     remove(resource);
                     alert("Object deleted successfully!");
                 } else {
-                    response.text().then(text => alert(text || 'Object deletion failed'));
+                    response.text().then(text => alert(text || 'Failed to delete object!'));
                 }
             })
             .catch(error => {
@@ -138,7 +138,13 @@ function edit(resource) {
 
     formCreator
         .append(new ElementCreator("label").text("Name").with("for", "resource-name"))
-        .append(new ElementCreator("input").id("resource-name").with("type", "text").with("value", resource.name));
+        .append(new ElementCreator("input").id("resource-name").with("type", "text").with("value", resource.name))
+        .append(new ElementCreator("label").text("SVN").with("for", "resource-SVN"))
+        .append(new ElementCreator("input").id("resource-SVN").with("type", "text").with("value", resource.SVN))
+        .append(new ElementCreator("label").text("Is employee in Home-Office?").with("for", "resource-homeOffice"))
+        .append(new ElementCreator("input").id("resource-homeOffice").with("type", "text").with("value", resource.homeOffice))
+        .append(new ElementCreator("label").text("Date of employment").with("for", "resource-dateOfEmployment"))
+        .append(new ElementCreator("input").id("resource-dateOfEmployment").with("type", "text").with("value", resource.dateOfEmployment));
 
     /* In the end, we add the code to handle saving the resource on the server and terminating edit mode */
     formCreator
@@ -152,12 +158,33 @@ function edit(resource) {
                and set in to the resource. The idea is that you handle your own properties here.
             */
             resource.name = document.getElementById("resource-name").value;
+            resource.SVN = document.getElementById("resource-SVN").value;
+            resource.homeOffice = document.getElementById("resource-homeOffice").value;
+            resource.dateOfEmployment = document.getElementById("resource-dateOfEmployment").value;
 
             /* Task 4 - Part 3: Call the update endpoint asynchronously. Once the call returns successfully,
                use the code below to remove the form we used for editing and again render 
                the resource in the list.
             */
-            add(resource, document.getElementById(resource.idforDOM));  // <- Call this after the resource is updated successfully on the server
+           fetch(`/api/resources/${resource.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(resource)
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    add(resource, document.getElementById(resource.idforDOM)); // <- Call this after the resource is updated successfully on the server
+                    alert("Object updated successfully!");
+                } else {
+                    response.text().then(text => alert(text || 'Failed to update object!'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
         }))
         .replace(document.querySelector('main'), document.getElementById(resource.idforDOM));
 }
