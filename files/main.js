@@ -142,7 +142,7 @@ function edit(resource) {
         .append(new ElementCreator("label").text("SVN").with("for", "resource-SVN"))
         .append(new ElementCreator("input").id("resource-SVN").with("type", "text").with("value", resource.SVN))
         .append(new ElementCreator("label").text("Is employee in Home-Office?").with("for", "resource-homeOffice"))
-        .append(new ElementCreator("input").id("resource-homeOffice").with("type", "text").with("value", resource.homeOffice))
+        .append(new ElementCreator("input").id("resource-homeOffice").with("type", "checkbox").with("value", resource.homeOffice))
         .append(new ElementCreator("label").text("Date of employment").with("for", "resource-dateOfEmployment"))
         .append(new ElementCreator("input").id("resource-dateOfEmployment").with("type", "text").with("value", resource.dateOfEmployment));
 
@@ -151,22 +151,45 @@ function edit(resource) {
         .append(new ElementCreator("button").text("Speichern").listener('click', (event) => {
             /* Why do we have to prevent the default action? Try commenting this line. */
             event.preventDefault();
-
+            
             /* The user saves the resource.
-               Task 4 - Part 2: We manually set the edited values from the input elements to the resource object. 
-               Again, this code here is just an example of how the name of our example resource can be obtained
-               and set in to the resource. The idea is that you handle your own properties here.
+                Task 4 - Part 2: We manually set the edited values from the input elements to the resource object. 
+                Again, this code here is just an example of how the name of our example resource can be obtained
+                and set in to the resource. The idea is that you handle your own properties here.
             */
-            resource.name = document.getElementById("resource-name").value;
-            resource.SVN = document.getElementById("resource-SVN").value;
-            resource.homeOffice = document.getElementById("resource-homeOffice").value;
-            resource.dateOfEmployment = document.getElementById("resource-dateOfEmployment").value;
+            const name = document.getElementById("resource-name").value.trim();
+            const SVN = document.getElementById("resource-SVN").value.trim();
+            const homeOffice = document.getElementById("resource-homeOffice").checked;
+            const dateOfEmployment = document.getElementById("resource-dateOfEmployment").value;
 
             /* Task 4 - Part 3: Call the update endpoint asynchronously. Once the call returns successfully,
                use the code below to remove the form we used for editing and again render 
                the resource in the list.
             */
-           fetch(`/api/resources/${resource.id}`, {
+            if (!/^[A-Za-z\s]+$/.test(name)) {
+                alert("Name must contain only letters and spaces!");
+                return;
+            }
+            if (!/^\d{12}$/.test(SVN)) {
+                alert("SVN must be exactly 12 digits!");
+                return;
+            }
+            if (!dateOfEmployment) {
+                alert("Date of employment is required!");
+                return;
+            }
+            const dateObj = new Date(dateOfEmployment);
+            if (isNaN(dateObj.getTime())) {
+                alert("Date of employment must be a valid date!");
+                return;
+            }
+
+            resource.name = name;
+            resource.SVN = Number(SVN);
+            resource.homeOffice = homeOffice;
+            resource.dateOfEmployment = dateOfEmployment;
+
+            fetch(`/api/resources/${resource.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -200,9 +223,80 @@ function remove(resource) {
     one that contains an id).
  */
 function create() {
-    alert("Not implemeted yet!");
+    const existingForm = document.getElementById("create-form");
+    if (existingForm) existingForm.remove();
+
+    const formCreator = new ElementCreator("form")
+        .id("create-form")
+        .append(new ElementCreator("h3").text("Add Employee"))
+        .append(new ElementCreator("label").text("Name").with("for", "create-name"))
+        .append(new ElementCreator("input").id("create-name").with("type", "text").with("required", "true"))
+        .append(new ElementCreator("label").text("SVN").with("for", "create-SVN"))
+        .append(new ElementCreator("input").id("create-SVN").with("type", "text").with("pattern", "^\d{12}$").with("required", "true"))
+        .append(new ElementCreator("label").text("Is employee in Home-Office?").with("for", "create-homeOffice"))
+        .append(new ElementCreator("input").id("create-homeOffice").with("type", "checkbox"))
+        .append(new ElementCreator("label").text("Date of employment").with("for", "create-dateOfEmployment"))
+        .append(new ElementCreator("input").id("create-dateOfEmployment").with("type", "date").with("required", "true"))
+        .append(new ElementCreator("button").text("Create").listener('click', (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById("create-name").value.trim();
+            const SVN = document.getElementById("create-SVN").value.trim();
+            const homeOffice = document.getElementById("create-homeOffice").checked;
+            const dateOfEmployment = document.getElementById("create-dateOfEmployment").value;
+
+            if (!/^[A-Za-z\s]+$/.test(name)) {
+                alert("Name must contain only letters and spaces!");
+                return;
+            }
+            if (!/^\d{12}$/.test(SVN)) {
+                alert("SVN must be exactly 12 digits!");
+                return;
+            }
+            if (!dateOfEmployment) {
+                alert("Date of employment is required!");
+                return;
+            }
+            const dateObj = new Date(dateOfEmployment);
+            if (isNaN(dateObj.getTime())) {
+                alert("Date of employment must be a valid date!");
+                return;
+            }
+
+            const resource = {
+                name,
+                SVN: Number(SVN),
+                homeOffice,
+                dateOfEmployment
+            };
+
+            fetch("/api/resources", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(resource)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => { throw new Error(text || "Failed to create object!"); });
+                }
+            })
+            .then(newResource => {
+                add(Object.assign(new Resource(), newResource));
+                alert("Object created successfully!");
+                formCreator.element.remove();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred. Please try again later.');
+            });
+        }));
+
+    formCreator.insertBefore(document.querySelector('main'), document.querySelector('#top'));
 }
-    
 
 document.addEventListener("DOMContentLoaded", function (event) {
 
